@@ -4,13 +4,101 @@ import * as os from 'os';
 import * as child_process from 'child_process';
 import { Config, CurrentConfig } from '../types';
 
+// Claude配置文件类型定义
+interface ClaudeSettings {
+    env: {
+        ANTHROPIC_AUTH_TOKEN?: string;
+        ANTHROPIC_BASE_URL?: string;
+        CLAUDE_CODE_MAX_OUTPUT_TOKENS?: string;
+        CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC?: number;
+    };
+    permissions: {
+        allow: string[];
+        deny: string[];
+    };
+}
+
 export class ConfigManager {
     private configFile: string;
     private currentFile: string;
+    private claudeSettingsFile: string;
 
     constructor() {
-        this.configFile = path.join(os.homedir(), '.claude_config');
-        this.currentFile = path.join(os.homedir(), '.claude_current');
+        this.configFile = path.join(os.homedir(),'.claude', '.claude_config');
+        this.currentFile = path.join(os.homedir(), '.claude','.claude_current');
+        this.claudeSettingsFile = path.join(os.homedir(), '.claude', 'settings.json');
+    }
+
+    /**
+     * 获取Claude配置文件路径
+     */
+    private getClaudeSettingsPath(): string {
+        return this.claudeSettingsFile;
+    }
+
+    /**
+     * 读取Claude配置文件
+     */
+    private readClaudeSettings(): ClaudeSettings {
+        const settingsPath = this.getClaudeSettingsPath();
+
+        try {
+            if (fs.existsSync(settingsPath)) {
+                const content = fs.readFileSync(settingsPath, 'utf8');
+                return JSON.parse(content);
+            }
+        } catch (error) {
+            console.warn(`读取Claude配置文件失败: ${error}`);
+        }
+
+        // 返回默认配置结构
+        return {
+            env: {
+                ANTHROPIC_AUTH_TOKEN: "",
+                ANTHROPIC_BASE_URL: "",
+                CLAUDE_CODE_MAX_OUTPUT_TOKENS: "32000",
+                CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: 1
+            },
+            permissions: {
+                allow: [],
+                deny: []
+            }
+        };
+    }
+
+    /**
+     * 写入Claude配置文件
+     */
+    private writeClaudeSettings(settings: ClaudeSettings): void {
+        const settingsPath = this.getClaudeSettingsPath();
+        const settingsDir = path.dirname(settingsPath);
+
+        try {
+            // 确保目录存在
+            if (!fs.existsSync(settingsDir)) {
+                fs.mkdirSync(settingsDir, { recursive: true });
+            }
+
+            // 写入配置文件
+            const content = JSON.stringify(settings, null, 2);
+            fs.writeFileSync(settingsPath, content, 'utf8');
+        } catch (error) {
+            throw new Error(`写入Claude配置文件失败: ${error}`);
+        }
+    }
+
+    /**
+     * 更新Claude配置文件中的认证信息
+     */
+    private updateClaudeSettings(token: string, baseUrl: string): void {
+        const settings = this.readClaudeSettings();
+
+        // 更新认证信息
+        settings.env.ANTHROPIC_AUTH_TOKEN = token;
+        settings.env.ANTHROPIC_BASE_URL = baseUrl;
+
+        // 写入更新后的配置
+        this.writeClaudeSettings(settings);
     }
 
     public initConfig(): void {
@@ -309,8 +397,17 @@ ${envVarEnd}`;
         const configLine = `${config.alias}|${config.name}|${config.token}|${config.url}|${config.type || 'TOKEN'}`;
         fs.writeFileSync(this.currentFile, configLine, 'utf8');
 
-        // 更新 shell 配置文件和设置环境变量
-        this.updateShellConfig(config);
+        try {
+            // 直接更新Claude配置文件
+            this.updateClaudeSettings(config.token, config.url);
+            console.log(`已更新Claude配置文件: ${this.claudeSettingsFile}`);
+            console.log(`✅ ANTHROPIC_AUTH_TOKEN 和 ANTHROPIC_BASE_URL 已成功更新`);
+        } catch (error) {
+            console.error(`更新Claude配置文件失败: ${error}`);
+            // 如果Claude配置文件更新失败，回退到原有的shell配置方式
+            console.log('回退到shell配置方式...');
+            this.updateShellConfig(config);
+        }
     }
 
     public getCurrentConfig(): CurrentConfig | null {

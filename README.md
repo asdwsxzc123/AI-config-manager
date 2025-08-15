@@ -94,7 +94,7 @@ acm help
 
 ## 配置文件
 
-配置文件位于 `~/.claude_config`，格式为：
+配置文件位于 `~/.claude/.claude_config`，格式为：
 ```
 别名|名称|API密钥|API地址
 ```
@@ -131,7 +131,7 @@ npm uninstall -g ai-config-manager
 acm list
 
 # 编辑配置文件，填入真实 API 密钥
-vim ~/.claude_config
+vim ~/.claude/.claude_config
 
 # 切换到 kimi 配置
 acm use kimi
@@ -148,15 +148,15 @@ acm use openai
 
 ## 工作原理
 
-1. **配置存储**: 所有配置存储在 `~/.claude_config` 文件中
-2. **当前配置跟踪**: 当前使用的配置记录在 `~/.claude_current` 文件中(待改进)
+1. **配置存储**: 所有配置存储在 `~/.claude/.claude_config` 文件中
+2. **当前配置跟踪**: 当前使用的配置记录在 `~/.claude/.claude_current` 文件中(待改进)
 3. **环境变量设置**: 使用 `acm use` 命令时自动导出相应的环境变量
 4. **配置验证**: 提供完整的错误处理和配置验证机制
 
 ## 故障排除
 
 如果遇到问题，请检查：
-1. 配置文件 `~/.claude_config` 是否存在且格式正确
+1. 配置文件 `~/.claude/.claude_config` 是否存在且格式正确
 2. API 密钥是否有效
 3. 网络连接是否正常
 4. 环境变量是否正确设置

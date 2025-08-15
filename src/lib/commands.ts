@@ -179,8 +179,8 @@ export class Commands {
         console.log('    acm current             # 查看当前配置');
         console.log();
         console.log(chalk.yellow('配置文件位置:'));
-        console.log('    ~/.claude_config        # 配置存储文件');
-        console.log('    ~/.claude_current       # 当前配置记录文件');
+        console.log('    ~/.claude/.claude_config        # 配置存储文件');
+        console.log('    ~/.claude/.claude_current       # 当前配置记录文件');
     }
 
 }

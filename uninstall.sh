@@ -3,8 +3,8 @@
 set -e
 
 ACM_DIR="$HOME/.acm"
-CONFIG_FILE="$HOME/.claude_config"
-CURRENT_FILE="$HOME/.claude_current"
+CONFIG_FILE="$HOME/.claude/.claude_config"
+CURRENT_FILE="$HOME/.claude/.claude_current"
 
 echo "🗑️  开始卸载 ACM (claude code auth manager)..."
 
@@ -21,7 +21,7 @@ if [[ -d "$ACM_DIR" ]]; then
 fi
 
 if [[ -f "$CONFIG_FILE" ]]; then
-    read -p "删除配置文件 ~/.claude_config? (y/N): " -n 1 -r
+    read -p "删除配置文件 ~/.claude/.claude_config? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         rm -f "$CONFIG_FILE"
