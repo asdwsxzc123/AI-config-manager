@@ -6,7 +6,7 @@ ACM_DIR="$HOME/.acm"
 CONFIG_FILE="$HOME/.claude_config"
 CURRENT_FILE="$HOME/.claude_current"
 
-echo "🗑️  开始卸载 ACM (AI Configuration Manager)..."
+echo "🗑️  开始卸载 ACM (claude code auth manager)..."
 
 read -p "确定要删除 ACM 吗? 这将删除所有配置文件 (y/N): " -n 1 -r
 echo
@@ -27,7 +27,7 @@ if [[ -f "$CONFIG_FILE" ]]; then
         rm -f "$CONFIG_FILE"
         echo "✓ 删除配置文件: $CONFIG_FILE"
     else
-        echo "保留配置文件: $CONFIG_FILE" 
+        echo "保留配置文件: $CONFIG_FILE"
     fi
 fi
 
@@ -64,8 +64,8 @@ case "$SHELL_TYPE" in
 esac
 
 if [[ -f "$PROFILE_FILE" ]]; then
-    if grep -q "ACM (AI Configuration Manager)" "$PROFILE_FILE"; then
-        sed -i.backup '/# ACM (AI Configuration Manager)/,+1d' "$PROFILE_FILE"
+    if grep -q "ACM (claude code auth manager)" "$PROFILE_FILE"; then
+        sed -i.backup '/# ACM (claude code auth manager)/,+1d' "$PROFILE_FILE"
         echo "✓ 从 $PROFILE_FILE 中移除 PATH 配置"
         echo "  备份文件: ${PROFILE_FILE}.backup"
     fi

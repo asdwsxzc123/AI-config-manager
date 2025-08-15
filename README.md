@@ -1,4 +1,4 @@
-# ACM (AI Configuration Manager)
+# ACM (claude-code-auth-manager)
 
 类似 nvm、nrm 的 AI API 配置切换工具，让您轻松管理和切换多个 Claude API 配置。
 
@@ -9,17 +9,21 @@
 - 🔧 支持添加、删除、列表和当前配置管理
 - 💾 自动配置文件管理
 - 🔄 环境变量自动设置
-- 🌍 多语言支持 (中文/English)
-- 🎯 自动语言检测
 
 ## Claude 中转推荐
-- aicodemirror [注册链接](https://www.aicodemirror.com/register?invitecode=JUONAJ) `邀请码 JUONAJ`
+1. 目前发现的最良心的中转站,每天签到送额度,注册送5刀,微信扫码注册
+- https://claude.husan97x.xyz/register?aff=k02G  
+2. 每天3000积分 https://www.aicodemirror.com/register?invitecode=8KTOWC
+3. 注册送7刀
+https://instcopilot-api.com/register?aff=qsCZ
+4. 注册送3000积分
+https://www.claude-code.top/register?inviteCode=8KTOWC
+5. 注册送1000point
+https://aicodeditor.com/register?invitecode=VHE6FK
+6. 注册送5刀
+https://ai-router.plugins-world.cn/register?aff=VvoS
 
-- aicodewith [注册链接](https://aicodewith.com/?invitation=WSC1JER) `邀请码 WSC1JER`
 
-- yourapi [注册链接](https://yourapi.cn/register?aff=zQOY) `邀请码 zQOY`
-
-- gaccode [注册链接](https://gaccode.com/signup?ref=5AUFSX1W) `邀请码 5AUFSX1W`
 
 
 ## 快速开始
@@ -29,7 +33,7 @@
 #### 方式1: NPM 全局安装 (推荐)
 
 ```bash
-npm install -g ai-config-manager
+npm install -g claude-code-auth-manager
 ```
 
 #### 方式2: 手动安装
@@ -44,7 +48,7 @@ cd ai-config-manager
 
 ```bash
 # 查看所有可用配置
-acm list 
+acm list
 或 acm ls
 
 # 切换到指定配置
@@ -62,9 +66,6 @@ acm remove openai
 
 # 查看当前配置
 acm current
-
-# 切换语言
-acm lang en
 
 # 查看帮助
 acm help
@@ -91,12 +92,6 @@ acm help
 ### acm current
 显示当前使用的配置详情和激活状态。
 
-### acm lang [language]
-切换界面语言或显示当前语言。
-- 无参数：显示当前语言
-- `zh`：切换到中文
-- `en`：切换到英文
-
 ## 配置文件
 
 配置文件位于 `~/.claude_config`，格式为：
@@ -116,27 +111,6 @@ kimi|月之暗面|sk-xxxxxxKIMIxxxxxx|https://api.moonshot.cn/anthropic|TOKEN
 ACM 会自动设置以下环境变量：
 - `ANTHROPIC_AUTH_TOKEN`: API 认证令牌
 - `ANTHROPIC_BASE_URL`: API 基础 URL
-
-## 多语言支持
-
-ACM 支持中文和英文界面，具有以下特性：
-
-1. **自动检测**：根据系统环境变量自动选择语言
-2. **手动切换**：使用 `acm lang <zh|en>` 命令切换
-3. **持久化**：语言设置保存在 `~/.acm_lang` 文件
-4. **实时生效**：切换后立即生效，无需重启
-
-### 语言切换示例
-```bash
-# 查看当前语言
-acm lang
-
-# 切换到英文
-acm lang en
-
-# 切换到中文  
-acm lang zh
-```
 
 ## 卸载
 

@@ -3,7 +3,6 @@ import * as path from 'path';
 import * as os from 'os';
 import * as child_process from 'child_process';
 import { Config, CurrentConfig } from '../types';
-import { i18n } from '../i18n';
 
 export class ConfigManager {
     private configFile: string;
@@ -17,10 +16,10 @@ export class ConfigManager {
     public initConfig(): void {
         if (!fs.existsSync(this.configFile)) {
             const defaultConfig = '';
-            
+
             fs.writeFileSync(this.configFile, defaultConfig, 'utf8');
-            console.log(i18n.t('config.created', this.configFile));
-            console.log(i18n.t('config.editHint'));
+            console.log(`已创建默认配置文件: ${this.configFile}`);
+            console.log('请编辑此文件，填入您的真实 API 密钥');
         }
     }
 
@@ -44,11 +43,11 @@ export class ConfigManager {
 
     public addConfig(alias: string, name: string, token: string, url: string, keyType?: 'KEY' | 'TOKEN'): void {
         const configs = this.getAllConfigs();
-        
+
         if (configs.find(config => config.alias === alias)) {
-            throw new Error(i18n.t('config.aliasExists', alias));
+            throw new Error(`配置别名 '${alias}' 已存在`);
         }
-        
+
         const newConfig = `${alias}|${name}|${token}|${url}|${keyType || 'TOKEN'}`;
         fs.appendFileSync(this.configFile, '\n' + newConfig, 'utf8');
     }
@@ -56,26 +55,26 @@ export class ConfigManager {
     public removeConfig(alias: string): Config {
         const configs = this.getAllConfigs();
         const configToRemove = configs.find(config => config.alias === alias);
-        
+
         if (!configToRemove) {
-            throw new Error(i18n.t('config.notFound', alias));
+            throw new Error(`配置 '${alias}' 不存在`);
         }
-        
+
         const remainingConfigs = configs.filter(config => config.alias !== alias);
-        const content = remainingConfigs.map(config => 
+        const content = remainingConfigs.map(config =>
             `${config.alias}|${config.name}|${config.token}|${config.url}|${config.type || 'TOKEN'}`
         ).join('\n');
-        
+
         fs.writeFileSync(this.configFile, content, 'utf8');
-        
+
         if (fs.existsSync(this.currentFile)) {
             const currentContent = fs.readFileSync(this.currentFile, 'utf8');
             if (currentContent.startsWith(alias + '|')) {
                 fs.unlinkSync(this.currentFile);
-                console.log(i18n.t('config.currentCleared'));
+                console.log('当前配置已清除');
             }
         }
-        
+
         return configToRemove;
     }
 
@@ -94,7 +93,7 @@ export class ConfigManager {
                 return 'powershell'; // 默认使用 PowerShell
             }
         }
-        
+
         // Unix 系统检测
         const shell = process.env.SHELL || '';
         if (shell.includes('zsh')) {
@@ -102,7 +101,7 @@ export class ConfigManager {
         } else if (shell.includes('bash')) {
             return 'bash';
         }
-        
+
         // 备用检测方法
         if (process.env.ZSH_VERSION || process.env.ZSH_NAME) {
             return 'zsh';
@@ -116,7 +115,7 @@ export class ConfigManager {
     private getProfileFile(): string {
         const shellType = this.detectShell();
         const homeDir = os.homedir();
-        
+
         if (this.isWindows()) {
             switch (shellType) {
                 case 'powershell':
@@ -134,7 +133,7 @@ export class ConfigManager {
                     return path.join(homeDir, 'Documents', 'WindowsPowerShell', 'Microsoft.PowerShell_profile.ps1');
             }
         }
-        
+
         // Unix 系统
         switch (shellType) {
             case 'zsh':
@@ -168,10 +167,10 @@ export class ConfigManager {
 
         const envVarStart = '# Claude Code Environment Variables';
         const envVarEnd = '# End Claude Code Environment Variables';
-        
+
         const startIndex = content.indexOf(envVarStart);
         const endIndex = content.indexOf(envVarEnd);
-        
+
         const envVar = config.type === 'KEY' ? 'ANTHROPIC_API_KEY' : 'ANTHROPIC_AUTH_TOKEN';
         const newEnvVars = `${envVarStart}
 $env:ANTHROPIC_BASE_URL = "${config.url}"
@@ -202,10 +201,10 @@ ${envVarEnd}`;
 
         const envVarStart = '# Claude Code Environment Variables';
         const envVarEnd = '# End Claude Code Environment Variables';
-        
+
         const startIndex = content.indexOf(envVarStart);
         const endIndex = content.indexOf(envVarEnd);
-        
+
         const envVar = config.type === 'KEY' ? 'ANTHROPIC_API_KEY' : 'ANTHROPIC_AUTH_TOKEN';
         const newEnvVars = `${envVarStart}
 export ANTHROPIC_BASE_URL="${config.url}"
@@ -231,15 +230,15 @@ ${envVarEnd}`;
     private setCurrentSessionEnvironmentVariables(config: Config): void {
         // 为当前 Node.js 进程设置环境变量（立即生效，acm 命令本身和子进程都能使用）
         const envVar = config.type === 'KEY' ? 'ANTHROPIC_API_KEY' : 'ANTHROPIC_AUTH_TOKEN';
-        
+
         // Clear both environment variables first
         delete process.env.ANTHROPIC_AUTH_TOKEN;
         delete process.env.ANTHROPIC_API_KEY;
-        
+
         // Set the appropriate one
         process.env[envVar] = config.token;
         process.env.ANTHROPIC_BASE_URL = config.url;
-        
+
         // 注意：Node.js 进程无法直接影响父 shell 的环境变量
         // 但我们保留这个设置，因为：
         // 1. 如果用户在脚本中调用 acm，这些变量会传递给子进程
@@ -284,24 +283,24 @@ ${envVarEnd}`;
                 const envVar = config.type === 'KEY' ? 'ANTHROPIC_API_KEY' : 'ANTHROPIC_AUTH_TOKEN';
                 this.setWindowsEnvironmentVariable('ANTHROPIC_BASE_URL', config.url);
                 this.setWindowsEnvironmentVariable(envVar, config.token);
-                console.log(i18n.t('config.windowsEnvVarSet'));
+                console.log('已设置 Windows 系统环境变量（重启终端后生效）');
             } else {
                 // PowerShell 配置文件
                 this.updateWindowsPowerShellConfig(config, profileFile);
-                console.log(i18n.t('config.shellConfigUpdated', profileFile));
+                console.log(`已更新 shell 配置文件: ${profileFile}`);
             }
         } else {
             // Unix 系统
             this.updateUnixShellConfig(config, profileFile);
-            console.log(i18n.t('config.shellConfigUpdated', profileFile));
-            
+            console.log(`已更新 shell 配置文件: ${profileFile}`);
+
             // 为其他终端提供 source 提示
             const sourceCmd = this.generateSourceCommand(profileFile);
             if (sourceCmd) {
-                console.log(i18n.t('config.unixSourceHint', profileFile));
+                console.log(`💡 提示：新开窗口立即生效。由于限制在当前窗口生效需运行 \`source ${profileFile}\` 后才能立即生效`);
             }
         }
-        
+
         // 创建便捷的激活方式
         // this.createConvenientWrapper(config);
     }
@@ -309,7 +308,7 @@ ${envVarEnd}`;
     public setCurrentConfig(config: Config): void {
         const configLine = `${config.alias}|${config.name}|${config.token}|${config.url}|${config.type || 'TOKEN'}`;
         fs.writeFileSync(this.currentFile, configLine, 'utf8');
-        
+
         // 更新 shell 配置文件和设置环境变量
         this.updateShellConfig(config);
     }
@@ -318,16 +317,16 @@ ${envVarEnd}`;
         if (!fs.existsSync(this.currentFile)) {
             return null;
         }
-        
+
         const content = fs.readFileSync(this.currentFile, 'utf8');
         const parts = content.split('|');
         const [alias, name, token, url] = parts;
         const type = parts[4] as 'KEY' | 'TOKEN' || 'TOKEN';
-        
+
         const envVar = type === 'KEY' ? 'ANTHROPIC_API_KEY' : 'ANTHROPIC_AUTH_TOKEN';
-        const isActive = process.env[envVar] === token && 
+        const isActive = process.env[envVar] === token &&
                         process.env.ANTHROPIC_BASE_URL === url;
-        
+
         return { alias, name, token, url, type, isActive };
     }
 }

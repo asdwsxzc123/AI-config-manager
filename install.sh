@@ -5,7 +5,7 @@ set -e
 ACM_DIR="$HOME/.acm"
 ACM_SCRIPT="$ACM_DIR/acm"
 
-echo "🚀 开始安装 ACM (AI Configuration Manager)..."
+echo "🚀 开始安装 ACM (claude-code-auth-manager)..."
 
 if [[ ! -d "$ACM_DIR" ]]; then
     mkdir -p "$ACM_DIR"
@@ -49,7 +49,7 @@ if [[ -f "$PROFILE_FILE" ]] && grep -q "$ACM_PATH_EXPORT" "$PROFILE_FILE"; then
     echo "✓ PATH 已存在于 $PROFILE_FILE"
 else
     echo "" >> "$PROFILE_FILE"
-    echo "# ACM (AI Configuration Manager)" >> "$PROFILE_FILE"
+    echo "# ACM (claude code auth manager)" >> "$PROFILE_FILE"
     echo "$ACM_PATH_EXPORT" >> "$PROFILE_FILE"
     echo "✓ 已添加 PATH 到 $PROFILE_FILE"
 fi

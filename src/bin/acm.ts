@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
-import { program } from 'commander';
+import { Command } from 'commander';
+const program = new Command();
 import { Commands } from '../lib/commands';
 
 const commands = new Commands();
 
 program
     .name('acm')
-    .description('ACM (AI Configuration Manager) - 类似 nvm/nrm 的 AI API 配置切换工具')
+    .description('ACM (claude code auth manager) - 类似 nvm/nrm 的 AI API 配置切换工具')
     .version('1.0.0');
 
 program
@@ -47,12 +48,6 @@ program
         commands.current();
     });
 
-program
-    .command('lang [language]')
-    .description('切换语言或显示当前语言')
-    .action((language?: string) => {
-        commands.lang(language);
-    });
 
 program
     .command('help', { isDefault: false })

@@ -1,6 +1,5 @@
 import chalk from 'chalk';
 import { ConfigManager } from './config';
-import { i18n, SupportedLanguage } from '../i18n';
 
 export class Commands {
     private configManager: ConfigManager;
@@ -12,74 +11,74 @@ export class Commands {
     public list(): void {
         try {
             const configs = this.configManager.getAllConfigs();
-            
-            console.log(chalk.cyan(i18n.t('commands.list.title')));
-            const headers = i18n.t('commands.list.headers.alias').padEnd(20) + 
-                           i18n.t('commands.list.headers.name').padEnd(15) + 
-                           i18n.t('commands.list.headers.token').padEnd(20) + 
-                           i18n.t('commands.list.headers.url');
+
+            console.log(chalk.cyan('可用配置:'));
+            const headers = '别名'.padEnd(20) +
+                           '类型'.padEnd(15) +
+                           'API密钥(前15位)'.padEnd(20) +
+                           'API地址';
             console.log(chalk.gray(headers));
             console.log(chalk.gray('------------------------------------------------------------'));
-            
+
             configs.forEach(config => {
                 const tokenPreview = config.token.substring(0, 15) + '...';
                 console.log(
-                    config.alias.padEnd(20) + 
-                    config.name.padEnd(15) + 
-                    tokenPreview.padEnd(20) + 
+                    config.alias.padEnd(20) +
+                    config.name.padEnd(15) +
+                    tokenPreview.padEnd(20) +
                     config.url
                 );
             });
         } catch (error) {
-            console.error(chalk.red(i18n.t('common.error') + ':'), (error as Error).message);
+            console.error(chalk.red('错误:'), (error as Error).message);
             process.exit(1);
         }
     }
 
     public use(alias: string): void {
         if (!alias) {
-            console.error(chalk.red(i18n.t('common.error') + ': ' + i18n.t('commands.use.missingAlias')));
-            console.log(i18n.t('commands.use.listHint'));
+            console.error(chalk.red('错误: 请指定配置别名'));
+            console.log('使用 \'acm list\' 查看可用配置');
             process.exit(1);
         }
 
         try {
             const config = this.configManager.getConfig(alias);
-            
+
             if (!config) {
-                console.error(chalk.red(i18n.t('common.error') + ': ' + i18n.t('commands.use.notFound', alias)));
-                console.log(i18n.t('commands.use.listHint'));
+                console.error(chalk.red(`错误: 未找到配置 '${alias}'`));
+                console.log('使用 \'acm list\' 查看可用配置');
                 process.exit(1);
             }
 
             this.configManager.setCurrentConfig(config);
-            
-            console.log(chalk.green(i18n.t('commands.use.switched', config.alias)));
-            console.log(chalk.gray(i18n.t('commands.use.apiUrl', config.url)));
-            console.log(chalk.gray(i18n.t('commands.use.token', config.token.substring(0, 15))));
+
+            console.log(chalk.green(`已切换到: ${config.alias}`));
+            console.log(chalk.gray(`API地址: ${config.url}`));
+            console.log(chalk.gray(`密钥: ${config.token.substring(0, 15)}...`));
         } catch (error) {
-            console.error(chalk.red(i18n.t('common.error') + ':'), (error as Error).message);
+            console.error(chalk.red('错误:'), (error as Error).message);
             process.exit(1);
         }
     }
 
     public add(alias: string, token: string, url: string, type?: string): void {
         if (!alias || !token || !url) {
-            console.error(chalk.red(i18n.t('common.error') + ': ' + i18n.t('commands.add.missingParams')));
-            console.log(i18n.t('commands.add.usage'));
+            console.error(chalk.red('错误: 参数不完整'));
+            console.log('用法: acm add <alias> <name> <token> <url>');
             process.exit(1);
         }
-        
+
         let name = 'Claude';
-        
+
         // Determine key type based on manual specification or URL rules
         let keyType = this.determineKeyType(url, type);
-        
+
         try {
             this.configManager.addConfig(alias, name, token, url, keyType);
-            console.log(chalk.green(i18n.t('commands.add.added', name, alias)));
+            console.log(chalk.green(`已添加配置: ${name} (${alias})`));
         } catch (error) {
-            console.error(chalk.red(i18n.t('common.error') + ':'), (error as Error).message);
+            console.error(chalk.red('错误:'), (error as Error).message);
             process.exit(1);
         }
     }
@@ -94,39 +93,39 @@ export class Commands {
                 return 'TOKEN';
             }
         }
-        
+
         // Built-in URL rules based on feature.md
         const tokenUrls = [
             'https://code.wenwen-ai.com',
             'https://api.aicodewith.com'
         ];
-        
+
         const keyUrls = [
             'https://api.aicodemirror.com/api/claudecode',
             'https://gaccode.com/claudecode'
         ];
-        
+
         if (tokenUrls.includes(url)) {
             return 'TOKEN';
         } else if (keyUrls.includes(url)) {
             return 'KEY';
         }
-        
+
         // Default to TOKEN for unknown URLs
         return 'TOKEN';
     }
 
     public remove(alias: string): void {
         if (!alias) {
-            console.error(chalk.red(i18n.t('common.error') + ': ' + i18n.t('commands.remove.missingAlias')));
+            console.error(chalk.red('错误: 请指定要删除的配置别名'));
             process.exit(1);
         }
 
         try {
             const removedConfig = this.configManager.removeConfig(alias);
-            console.log(chalk.green(i18n.t('commands.remove.removed', removedConfig.name, alias)));
+            console.log(chalk.green(`已删除配置: ${removedConfig.name} (${alias})`));
         } catch (error) {
-            console.error(chalk.red(i18n.t('common.error') + ':'), (error as Error).message);
+            console.error(chalk.red('错误:'), (error as Error).message);
             process.exit(1);
         }
     }
@@ -134,74 +133,54 @@ export class Commands {
     public current(): void {
         try {
             const currentConfig = this.configManager.getCurrentConfig();
-            
+
             if (!currentConfig) {
-                console.log(chalk.yellow(i18n.t('commands.current.none')));
-                console.log(i18n.t('commands.current.hint'));
+                console.log(chalk.yellow('当前没有设置任何配置'));
+                console.log('使用 \'acm use <alias>\' 设置配置');
                 return;
             }
 
-            console.log(chalk.cyan(i18n.t('commands.current.title')));
-            console.log(chalk.gray(i18n.t('commands.current.alias', currentConfig.alias)));
-            console.log(chalk.gray(i18n.t('commands.current.name', currentConfig.name)));
-            console.log(chalk.gray(i18n.t('commands.current.url', currentConfig.url)));
-            console.log(chalk.gray(i18n.t('commands.current.token', currentConfig.token.substring(0, 15))));
-            
+            console.log(chalk.cyan('当前配置:'));
+            console.log(chalk.gray(`别名: ${currentConfig.alias}`));
+            console.log(chalk.gray(`类型: ${currentConfig.name}`));
+            console.log(chalk.gray(`API地址: ${currentConfig.url}`));
+            console.log(chalk.gray(`密钥: ${currentConfig.token.substring(0, 15)}...`));
+
             if (currentConfig.isActive) {
-                console.log(chalk.green(i18n.t('commands.current.active')));
+                console.log(chalk.green('状态: 已激活 ✓'));
             } else {
-                console.log(chalk.yellow(i18n.t('commands.current.inactive', currentConfig.alias)));
+                console.log(chalk.yellow(`状态: 未激活 (请运行 'acm use ${currentConfig.alias}' 激活)`));
             }
         } catch (error) {
-            console.error(chalk.red(i18n.t('common.error') + ':'), (error as Error).message);
+            console.error(chalk.red('错误:'), (error as Error).message);
             process.exit(1);
         }
     }
 
     public help(): void {
-        console.log(chalk.cyan.bold(i18n.t('commands.help.title')));
+        console.log(chalk.cyan.bold('ACM (claude code auth manager) - 类似 nvm/nrm 的 AI API 配置切换工具'));
         console.log();
-        console.log(chalk.yellow(i18n.t('commands.help.usage')));
-        console.log('    ' + i18n.t('commands.help.usageText'));
+        console.log(chalk.yellow('用法:'));
+        console.log('    acm <command> [arguments]');
         console.log();
-        console.log(chalk.yellow(i18n.t('commands.help.commands')));
-        console.log('    ' + i18n.t('commands.help.commandList.use'));
-        console.log('    ' + i18n.t('commands.help.commandList.list'));
-        console.log('    ' + i18n.t('commands.help.commandList.add'));
-        console.log('    ' + i18n.t('commands.help.commandList.remove'));
-        console.log('    ' + i18n.t('commands.help.commandList.current'));
-        console.log('    ' + i18n.t('commands.help.commandList.lang'));
-        console.log('    ' + i18n.t('commands.help.commandList.help'));
+        console.log(chalk.yellow('命令:'));
+        console.log('    use <alias>              切换到指定的配置');
+        console.log('    list                     显示所有可用配置');
+        console.log('    add <alias> <token> <url> [key_type] 添加新配置');
+        console.log('    remove <alias>           删除指定配置');
+        console.log('    current                  显示当前使用的配置');
+        console.log('    help                     显示此帮助信息');
         console.log();
-        console.log(chalk.yellow(i18n.t('commands.help.examples')));
-        console.log('    ' + i18n.t('commands.help.exampleList.use'));
-        console.log('    ' + i18n.t('commands.help.exampleList.list'));
-        console.log('    ' + i18n.t('commands.help.exampleList.add'));
-        console.log('    ' + i18n.t('commands.help.exampleList.remove'));
-        console.log('    ' + i18n.t('commands.help.exampleList.current'));
-        console.log('    ' + i18n.t('commands.help.exampleList.lang'));
+        console.log(chalk.yellow('示例:'));
+        console.log('    acm use kimi            # 切换到 kimi 配置');
+        console.log('    acm list                # 查看所有配置');
+        console.log('    acm add openai OpenAI sk-xxx https://api.openai.com');
+        console.log('    acm remove openai       # 删除 openai 配置');
+        console.log('    acm current             # 查看当前配置');
         console.log();
-        console.log(chalk.yellow(i18n.t('commands.help.configFiles')));
-        console.log('    ' + i18n.t('commands.help.configFileList.config'));
-        console.log('    ' + i18n.t('commands.help.configFileList.current'));
-        console.log('    ' + i18n.t('commands.help.configFileList.lang'));
+        console.log(chalk.yellow('配置文件位置:'));
+        console.log('    ~/.claude_config        # 配置存储文件');
+        console.log('    ~/.claude_current       # 当前配置记录文件');
     }
 
-    public lang(language?: string): void {
-        if (!language) {
-            const currentLang = i18n.getCurrentLanguage();
-            const langName = i18n.t('commands.lang.languageNames.' + currentLang);
-            console.log(i18n.t('commands.lang.current', langName));
-            return;
-        }
-
-        if (language !== 'zh' && language !== 'en') {
-            console.error(chalk.red(i18n.t('common.error') + ': ' + i18n.t('commands.lang.usage')));
-            process.exit(1);
-        }
-
-        i18n.setLanguage(language as SupportedLanguage);
-        const langName = i18n.t('commands.lang.languageNames.' + language);
-        console.log(chalk.green(i18n.t('commands.lang.switched', langName)));
-    }
 }
