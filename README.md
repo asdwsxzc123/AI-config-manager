@@ -2,6 +2,10 @@
 
 类似 nvm、nrm 的 AI API 配置切换工具，让您轻松管理和切换多个 Claude API 配置。
 
+感觉不太好用,重新 fork一个其他的项目
+
+https://github.com/asdwsxzc123/claude-config-switcher
+
 ## 特性
 
 - 🚀 一键切换多个 AI API 配置
