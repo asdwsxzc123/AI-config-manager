@@ -10,20 +10,16 @@
 - 💾 自动配置文件管理
 - 🔄 环境变量自动设置
 
-## Claude 中转推荐
-1. 目前发现的最良心的中转站,每天签到送额度,注册送5刀,微信扫码注册
-- https://claude.husan97x.xyz/register?aff=k02G  
-2. 每天3000积分 https://www.aicodemirror.com/register?invitecode=8KTOWC
-3. 注册送7刀
-https://instcopilot-api.com/register?aff=qsCZ
-4. 注册送3000积分
-https://www.claude-code.top/register?inviteCode=8KTOWC
-5. 注册送1000point
-https://aicodeditor.com/register?invitecode=VHE6FK
-6. 注册送5刀
-https://ai-router.plugins-world.cn/register?aff=VvoS
-
-
+## Claude code 中转推荐
+1. 注册送 10刀,每天签到(需要充值 30 元)送额度  https://claude.husan97x.xyz/register?aff=k02G    
+1. 每天3000积分  https://www.aicodemirror.com/register?invitecode=8KTOWC  
+	- 高峰期免费用户用不了
+1. 注册送3000积分  https://www.claude-code.top/register?inviteCode=8KTOWC  
+1. 注册送1000point  https://aicodeditor.com/register?invitecode=VHE6FK  
+	- 相当于20刀左右
+1. 注册送5刀  https://ai-router.plugins-world.cn/register?aff=VvoS
+1. 注册 25刀 https://code.wenwen-ai.com/register?aff=a0FY
+1. 注册 20刀 https://a-generic.be-a.dev/register?aff=aVGl
 
 
 ## 快速开始
